@@ -437,7 +437,7 @@
       </div>
 
       <div class="card" style="text-align:center;">
-        <span class="badge badge-blue">🔄 Atualizando a cada 10s</span>
+        <span class="badge badge-blue">🔄 Atualizando a cada 5s</span>
         <div style="margin-top:12px; font-size:14px; color:var(--text-muted);">
           Rota: <strong id="rotaFila">—</strong>
         </div>
@@ -902,7 +902,7 @@
         if (state.driverId) {
           atualizarStatus();
         }
-      }, 10000); // 10 segundos
+      }, 5000); // 5 segundos
     }
 
     function stopPolling() {
