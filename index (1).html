@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#EE4D2D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <title>Rotas NS</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #EE4D2D;
+      --orange-dark: #D4421B;
+      --orange-light: #FF6B4A;
+      --bg: #1a1a1a;
+      --bg-card: #2a2a2a;
+      --bg-card-hover: #333;
+      --text: #f0f0f0;
+      --text-muted: #999;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --yellow: #f39c12;
+      --blue: #3498db;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 12px rgba(238,77,45,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .header-text { flex: 1; }
+    .header-title { font-size: 18px; font-weight: 700; color: #fff; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+
+    .header-logout {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      display: none;
+    }
+
+    /* ===== TELAS ===== */
+    .tela {
+      display: none;
+      flex: 1;
+      padding: 24px 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tela.active { display: flex; flex-direction: column; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .card-icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ===== INPUTS ===== */
+    .input-group { margin-bottom: 20px; }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      background: #333;
+      border: 2px solid #444;
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus { border-color: var(--orange); }
+
+    .input-field::placeholder { color: #666; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(238,77,45,0.4);
+    }
+
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(238,77,45,0.6); }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--green) 0%, #27ae60 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(46,204,113,0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--red) 0%, #c0392b 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(231,76,60,0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--orange);
+      color: var(--orange);
+    }
+
+    .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ===== STATUS BADGE ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .badge-green { background: rgba(46,204,113,0.15); color: var(--green); }
+    .badge-yellow { background: rgba(243,156,18,0.15); color: var(--yellow); }
+    .badge-red { background: rgba(231,76,60,0.15); color: var(--red); }
+    .badge-blue { background: rgba(52,152,219,0.15); color: var(--blue); }
+
+    /* ===== FILA ===== */
+    .fila-position {
+      font-size: 72px;
+      font-weight: 900;
+      text-align: center;
+      color: var(--orange);
+      margin: 20px 0 8px;
+      line-height: 1;
+    }
+
+    .fila-label {
+      text-align: center;
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .fila-info {
+      background: rgba(238,77,45,0.1);
+      border: 1px solid rgba(238,77,45,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .fila-info p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ===== CHAMADO (bancada) ===== */
+    .chamado-box {
+      background: linear-gradient(135deg, rgba(46,204,113,0.15), rgba(46,204,113,0.05));
+      border: 2px solid var(--green);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(46,204,113,0.4); }
+      50% { box-shadow: 0 0 0 15px rgba(46,204,113,0); }
+    }
+
+    .chamado-bancada {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green);
+      margin: 12px 0 8px;
+    }
+
+    /* ===== LOADING ===== */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .loading-overlay.show { display: flex; }
+
+    .loading-text { color: #fff; font-size: 14px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      max-width: 90vw;
+      text-align: center;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast-error { background: var(--red); color: #fff; }
+    .toast-success { background: var(--green); color: #fff; }
+    .toast-warning { background: var(--yellow); color: #1a1a1a; }
+
+    /* ===== SPACER ===== */
+    .spacer { flex: 1; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .text-center { text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <div class="header">
+    <div class="header-logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M20 8H17V4H3C1.9 4 1 4.9 1 6V17H3C3 18.66 4.34 20 6 20S9 18.66 9 17H15C15 18.66 16.34 20 18 20S21 18.66 21 17H23V12L20 8ZM6 18.5C5.17 18.5 4.5 17.83 4.5 17S5.17 15.5 6 15.5 7.5 16.17 7.5 17 6.83 18.5 6 18.5ZM19.5 9.5L21.46 12H17V9.5H19.5ZM18 18.5C17.17 18.5 16.5 17.83 16.5 17S17.17 15.5 18 15.5 19.5 16.17 19.5 17 18.83 18.5 18 18.5Z" fill="white"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title">Rotas NS</div>
+      <div class="header-sub" id="headerSub">Sistema de Fila Virtual</div>
+    </div>
+    <button class="header-logout" id="btnLogout" onclick="logout()">Sair</button>
+  </div>
+
+  <!-- ===== TELA 1: LOGIN ===== -->
+  <div id="tela-login" class="tela active">
+    <div class="card">
+      <div class="card-icon">🚚</div>
+      <div class="card-title">Bem-vindo, Motorista!</div>
+      <div class="card-desc">Digite seu ID para acessar o sistema de rotas e fila virtual.</div>
+    </div>
+
+    <div class="card">
+      <div class="input-group">
+        <label for="inputDriverId">Seu ID de Motorista</label>
+        <input type="text" id="inputDriverId" class="input-field" placeholder="Ex: 12345" autocomplete="off" inputmode="text">
+      </div>
+      <button class="btn btn-primary" id="btnLogin" onclick="doLogin()">
+        Entrar
+      </button>
+    </div>
+
+    <div class="spacer"></div>
+    <p class="text-center" style="color: var(--text-muted); font-size: 12px; padding: 20px;">
+      Rotas NS v1.0 — Sistema de Fila Virtual
+    </p>
+  </div>
+
+  <!-- ===== TELA 2: ROTA PENDENTE ===== -->
+  <div id="tela-rota" class="tela">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Rota Pendente</div>
+      <div class="card-desc">Você tem uma rota atribuída. Confirme ou recuse abaixo.</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <span class="badge badge-yellow">⏳ Aguardando confirmação</span>
+      </div>
+      <div style="font-size:14px; color:var(--text-muted); margin-bottom:4px;">Rota / Cluster</div>
+      <div style="font-size:24px; font-weight:800; color:var(--orange);" id="rotaNome">—</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="aceitarRota()">✅ Aceitar</button>
+      <button class="btn btn-danger" onclick="recusarRota()">❌ Recusar</button>
+    </div>
+  </div>
+
+  <!-- ===== TELA 3: CHECK-IN ===== -->
+  <div id="tela-checkin" class="tela">
+    <div class="card">
+      <div class="card-icon">📍</div>
+      <div class="card-title">Fazer Check-in</div>
+      <div class="card-desc">Você aceitou a rota! Agora faça check-in quando estiver no hub.</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+        <span class="badge badge-green">✅ Rota aceita</span>
+      </div>
+      <div style="font-size:14px; color:var(--text-muted); margin-bottom:4px;">Sua Rota</div>
+      <div style="font-size:20px; font-weight:700;" id="rotaCheckin">—</div>
+    </div>
+
+    <div class="card" id="geoStatus" style="text-align:center;">
+      <div style="font-size:14px; color:var(--text-muted); margin-bottom:8px;">📡 Localização</div>
+      <div style="font-size:14px;" id="geoText">Aguardando permissão de localização...</div>
+    </div>
+
+    <button class="btn btn-primary mt-16" id="btnCheckin" onclick="doCheckin()" disabled>
+      📍 Fazer Check-in
+    </button>
+
+    <div class="fila-info mt-16">
+      <p>⚠️ Você precisa estar a no máximo <strong>200 metros</strong> do hub para fazer check-in.</p>
+    </div>
+  </div>
+
+  <!-- ===== TELA 4: FILA VIRTUAL ===== -->
+  <div id="tela-fila" class="tela">
+    <div class="card" id="filaHeader">
+      <div class="card-icon">⏳</div>
+      <div class="card-title">Fila Virtual</div>
+      <div class="card-desc">Aguarde sua vez. Você será notificado quando for chamado.</div>
+    </div>
+
+    <!-- Sub-tela: Aguardando na fila -->
+    <div id="filaAguardando">
+      <div class="card">
+        <div class="fila-label">Sua posição na fila</div>
+        <div class="fila-position" id="filaPosicao">—</div>
+        <div class="fila-label" id="filaMsg">Aguarde ser chamado...</div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <span class="badge badge-blue">🔄 Atualizando a cada 5s</span>
+        <div style="margin-top:12px; font-size:14px; color:var(--text-muted);">
+          Rota: <strong id="rotaFila">—</strong>
+        </div>
+        <div style="margin-top:4px; font-size:13px; color:var(--text-muted);">
+          Check-in: <span id="horaFila">—</span>
+        </div>
+      </div>
+
+      <button class="btn btn-danger mt-16" onclick="sairDaFila()">
+        🚪 Sair da Fila
+      </button>
+    </div>
+
+    <!-- Sub-tela: Chamado para bancada -->
+    <div id="filaChamado" style="display:none;">
+      <div class="chamado-box">
+        <div style="font-size:56px;">🟢</div>
+        <div style="font-size:20px; color:var(--green); font-weight:700; margin-top:12px;">Sua vez chegou!</div>
+        <div style="font-size:16px; color:var(--text-muted); margin-top:8px;">Dirija-se à</div>
+        <div class="chamado-bancada" id="bancadaNome" style="font-size:36px;">MESA 1</div>
+        <div style="font-size:14px; color:var(--green); margin-top:8px; font-weight:600;">Vá agora mesmo!</div>
+      </div>
+
+      <div class="card mt-16" style="text-align:center;">
+        <div style="font-size:14px; color:var(--text-muted);">
+          Rota: <strong id="rotaChamado">—</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TELA 5: CONCLUÍDO ===== -->
+  <div id="tela-concluido" class="tela">
+    <div class="spacer"></div>
+    <div class="card" style="text-align:center;">
+      <div class="card-icon">🎉</div>
+      <div class="card-title">Atendimento Concluído!</div>
+      <div class="card-desc">Seu atendimento foi finalizado com sucesso. Tenha uma boa viagem!</div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-outline" onclick="logout()">🔄 Voltar ao Início</button>
+  </div>
+
+  <!-- ===== TELA: SEM ROTA ===== -->
+  <div id="tela-semrota" class="tela">
+    <div class="spacer"></div>
+    <div class="card" style="text-align:center;">
+      <div class="card-icon">📭</div>
+      <div class="card-title">Nenhuma Rota</div>
+      <div class="card-desc">Você ainda não tem nenhuma rota atribuída. Aguarde a atribuição pelo analista.</div>
+    </div>
+    <button class="btn btn-outline mt-24" onclick="atualizarStatus()">🔄 Verificar Novamente</button>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- ===== TELA: NOSHOW ===== -->
+  <div id="tela-noshow" class="tela">
+    <div class="spacer"></div>
+    <div class="card" style="text-align:center;">
+      <div class="card-icon">❌</div>
+      <div class="card-title">Rota Recusada</div>
+      <div class="card-desc">Sua rota foi marcada como recusada. Por favor, entre em contato com um analista.</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- ===== TELA: ESPERA ===== -->
+  <div id="tela-espera" class="tela">
+    <div class="spacer"></div>
+    <div class="card" style="text-align:center;">
+      <div class="card-icon">⏸️</div>
+      <div class="card-title">Removido da Fila</div>
+      <div class="card-desc">Você foi removido da fila virtual. Por favor, contactar um analista para mais informações.</div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <!-- ===== LOADING OVERLAY ===== -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Carregando...</div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== FIREBASE SDK ===== -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
+  <script>
+    // ============================================================
+    // CONFIGURAÇÃO
+    // ============================================================
+
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpQ6Qx7xG7ofzdDKNuE8FGJvdRYkiX_XVinZupLV5OQkKmA3jOtb6KBUxm7sqhu1rA/exec';
+
+    var firebaseConfig = {
+      apiKey:            'AIzaSyA1pX97JMVtCuUsnDehvFaIpd30eIr7YxU',
+      projectId:         'rotas-ns',
+      messagingSenderId: '532204301425',
+      appId:             '1:532204301425:web:775860c2f0545aa0a4bfd0'
+    };
+
+    var VAPID_KEY = 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0';
+
+    // ============================================================
+    // ESTADO
+    // ============================================================
+
+    var state = {
+      driverId: localStorage.getItem('rotas_ns_driver_id') || '',
+      screen:   'login',
+      rota:     '',
+      bancada:  '',
+      posicao:  0,
+      horaCi:   '',
+      polling:  null,
+      geoLat:   null,
+      geoLng:   null,
+      geoWatch: null
+    };
+
+    // ============================================================
+    // FIREBASE — Inicialização + Push
+    // ============================================================
+
+    var messaging = null;
+
+    function initFirebase() {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        messaging = firebase.messaging();
+
+        // Handler de mensagens em foreground
+        messaging.onMessage(function(payload) {
+          console.log('[FCM] Foreground:', payload);
+          var n = payload.notification || {};
+          showToast(n.title + ': ' + n.body, 'success', 5000);
+
+          // Atualizar status automaticamente ao receber push
+          if (state.driverId) {
+            atualizarStatus();
+          }
+        });
+      } catch (e) {
+        console.warn('Firebase init error:', e);
+      }
+    }
+
+    function requestPushPermission() {
+      if (!messaging) return;
+
+      Notification.requestPermission().then(function(permission) {
+        if (permission === 'granted') {
+          messaging.getToken({ vapidKey: VAPID_KEY }).then(function(token) {
+            console.log('[FCM] Token:', token);
+            // Registrar token no backend
+            apiCall('registrarToken', { driverId: state.driverId, token: token });
+          }).catch(function(err) {
+            console.warn('Erro ao obter token FCM:', err);
+          });
+        }
+      });
+    }
+
+    // ============================================================
+    // SERVICE WORKER
+    // ============================================================
+
+    function registerSW() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+          .then(function(reg) {
+            console.log('[SW] Registrado:', reg.scope);
+          })
+          .catch(function(err) {
+            console.warn('[SW] Erro:', err);
+          });
+      }
+    }
+
+    // ============================================================
+    // API — Comunicação com Apps Script
+    // ============================================================
+
+    function apiCall(action, data, showLoading) {
+      if (showLoading !== false) showLoader('Processando...');
+
+      var payload = Object.assign({ action: action }, data || {});
+
+      return fetch(SCRIPT_URL, {
+        method:   'POST',
+        redirect: 'follow',
+        headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:     JSON.stringify(payload)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(result) {
+        hideLoader();
+        return result;
+      })
+      .catch(function(err) {
+        hideLoader();
+        showToast('Erro de conexão: ' + err.message, 'error');
+        throw err;
+      });
+    }
+
+    // ============================================================
+    // AÇÕES — Login, Aceitar, Recusar, Check-in
+    // ============================================================
+
+    function doLogin() {
+      var id = document.getElementById('inputDriverId').value.trim();
+      if (!id) {
+        showToast('Digite seu ID de motorista', 'warning');
+        return;
+      }
+
+      apiCall('login', { driverId: id }).then(function(r) {
+        if (r.success) {
+          state.driverId = id;
+          localStorage.setItem('rotas_ns_driver_id', id);
+          atualizarTela(r);
+
+          // Registrar push e iniciar polling
+          requestPushPermission();
+          startPolling();
+        } else {
+          showToast(r.message || 'ID não encontrado', 'error');
+        }
+      });
+    }
+
+    function aceitarRota() {
+      apiCall('aceitar', { driverId: state.driverId }).then(function(r) {
+        if (r.success) {
+          showToast('Rota aceita! Faça o check-in.', 'success');
+          atualizarTela(r);
+        } else {
+          showToast(r.message, 'error');
+        }
+      });
+    }
+
+    function recusarRota() {
+      if (!confirm('Tem certeza que deseja RECUSAR esta rota?')) return;
+
+      apiCall('recusar', { driverId: state.driverId }).then(function(r) {
+        if (r.success) {
+          showToast('Rota recusada.', 'warning');
+          atualizarTela(r);
+        } else {
+          showToast(r.message, 'error');
+        }
+      });
+    }
+
+    function doCheckin() {
+      if (state.geoLat === null || state.geoLng === null) {
+        showToast('Aguarde a localização ser obtida', 'warning');
+        return;
+      }
+
+      apiCall('checkin', {
+        driverId: state.driverId,
+        lat: state.geoLat,
+        lng: state.geoLng
+      }).then(function(r) {
+        if (r.success) {
+          showToast('Check-in realizado!', 'success');
+          atualizarTela(r);
+        } else {
+          showToast(r.message, 'error');
+        }
+      });
+    }
+
+    function atualizarStatus() {
+      apiCall('status', { driverId: state.driverId }, false).then(function(r) {
+        if (r.success) {
+          atualizarTela(r);
+        }
+      }).catch(function() {
+        // Silencioso no polling
+      });
+    }
+
+    function sairDaFila() {
+      if (!confirm('⚠️ ATENÇÃO!\n\nSe você sair, PERDERÁ sua posição na fila e terá que refazer todo o processo (aceitar rota + check-in).\n\nTem certeza que deseja sair?')) return;
+
+      apiCall('sairFila', { driverId: state.driverId }).then(function(r) {
+        if (r.success) {
+          showToast('Você saiu da fila.', 'warning');
+          atualizarTela(r);
+        } else {
+          showToast(r.message, 'error');
+        }
+      });
+    }
+
+    function logout() {
+      // Se está na fila ou chamado, avisar que vai perder a posição
+      if (state.screen === 'fila' || state.screen === 'chamado') {
+        if (!confirm('⚠️ ATENÇÃO!\n\nVocê está na fila virtual. Se sair agora, PERDERÁ sua posição e terá que refazer todo o processo.\n\nTem certeza que deseja sair?')) return;
+
+        // Chamar sairFila no backend para limpar os dados
+        apiCall('sairFila', { driverId: state.driverId }, false).catch(function() {});
+      }
+
+      stopPolling();
+      stopGeoWatch();
+      state.driverId = '';
+      localStorage.removeItem('rotas_ns_driver_id');
+      mostrarTela('login');
+      document.getElementById('inputDriverId').value = '';
+      document.getElementById('btnLogout').style.display = 'none';
+      document.getElementById('headerSub').textContent = 'Sistema de Fila Virtual';
+    }
+
+    // ============================================================
+    // TELA — Renderização
+    // ============================================================
+
+    function atualizarTela(data) {
+      // SEGURANÇA: se o status bruto é CARREGANDO, forçar tela chamado
+      // (cobre casos onde o backend não retorna screen='chamado' corretamente)
+      if (data.status === 'CARREGANDO' && data.screen !== 'chamado') {
+        data.screen = 'chamado';
+      }
+
+      state.screen  = data.screen;
+      state.rota    = data.rota || '';
+      state.bancada = data.bancada || '';
+      state.posicao = data.posicao || 0;
+      state.horaCi  = data.horaCi || '';
+
+      // Header
+      document.getElementById('btnLogout').style.display = 'block';
+      document.getElementById('headerSub').textContent = 'ID: ' + state.driverId;
+
+      switch (data.screen) {
+        case 'rota_pendente':
+          document.getElementById('rotaNome').textContent = state.rota;
+          mostrarTela('rota');
+          break;
+
+        case 'checkin':
+          document.getElementById('rotaCheckin').textContent = state.rota;
+          mostrarTela('checkin');
+          startGeoWatch();
+          break;
+
+        case 'fila':
+          document.getElementById('filaPosicao').textContent = state.posicao + 'º';
+          document.getElementById('filaMsg').textContent =
+            state.posicao === 1 ? 'Você é o próximo!' : 'Aguarde ser chamado...';
+          document.getElementById('rotaFila').textContent = state.rota;
+          document.getElementById('horaFila').textContent = state.horaCi;
+          document.getElementById('filaHeader').style.display = 'block';
+          document.getElementById('filaAguardando').style.display = 'block';
+          document.getElementById('filaChamado').style.display = 'none';
+          mostrarTela('fila');
+          break;
+
+        case 'chamado':
+          document.getElementById('bancadaNome').textContent = state.bancada || 'Aguarde atribuição...';
+          document.getElementById('rotaChamado').textContent = state.rota;
+          document.getElementById('filaHeader').style.display = 'none';
+          document.getElementById('filaAguardando').style.display = 'none';
+          document.getElementById('filaChamado').style.display = 'block';
+          mostrarTela('fila');
+          // Vibrar o celular para chamar atenção (se suportado)
+          if (navigator.vibrate) {
+            navigator.vibrate([300, 100, 300, 100, 300]);
+          }
+          break;
+
+        case 'concluido':
+          mostrarTela('concluido');
+          stopPolling();
+          break;
+
+        case 'noshow':
+          mostrarTela('noshow');
+          stopPolling();
+          break;
+
+        case 'espera':
+          mostrarTela('espera');
+          stopPolling();
+          break;
+
+        case 'sem_rota':
+          mostrarTela('semrota');
+          break;
+
+        default:
+          mostrarTela('login');
+      }
+    }
+
+    function mostrarTela(nome) {
+      var telas = document.querySelectorAll('.tela');
+      for (var i = 0; i < telas.length; i++) {
+        telas[i].classList.remove('active');
+      }
+      var tela = document.getElementById('tela-' + nome);
+      if (tela) tela.classList.add('active');
+    }
+
+    // ============================================================
+    // GEOLOCALIZAÇÃO
+    // ============================================================
+
+    function startGeoWatch() {
+      if (state.geoWatch) return;
+
+      if (!navigator.geolocation) {
+        document.getElementById('geoText').textContent = '❌ Geolocalização não suportada';
+        return;
+      }
+
+      state.geoWatch = navigator.geolocation.watchPosition(
+        function(pos) {
+          state.geoLat = pos.coords.latitude;
+          state.geoLng = pos.coords.longitude;
+
+          var dist = haversine(
+            -27.589518131075458, -48.68250212416386,
+            state.geoLat, state.geoLng
+          );
+
+          var distText = Math.round(dist) + 'm do hub';
+          var ok = dist <= 200;
+
+          document.getElementById('geoText').textContent =
+            (ok ? '✅ ' : '⚠️ ') + distText;
+          document.getElementById('geoText').style.color =
+            ok ? 'var(--green)' : 'var(--yellow)';
+          document.getElementById('btnCheckin').disabled = !ok;
+        },
+        function(err) {
+          document.getElementById('geoText').textContent = '❌ Erro: ' + err.message;
+          document.getElementById('btnCheckin').disabled = true;
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      );
+    }
+
+    function stopGeoWatch() {
+      if (state.geoWatch) {
+        navigator.geolocation.clearWatch(state.geoWatch);
+        state.geoWatch = null;
+      }
+    }
+
+    function haversine(lat1, lng1, lat2, lng2) {
+      var R = 6371000;
+      var dLat = (lat2 - lat1) * Math.PI / 180;
+      var dLng = (lng2 - lng1) * Math.PI / 180;
+      var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    // ============================================================
+    // POLLING
+    // ============================================================
+
+    function startPolling() {
+      stopPolling();
+      state.polling = setInterval(function() {
+        if (state.driverId) {
+          atualizarStatus();
+        }
+      }, 5000); // 5 segundos
+    }
+
+    function stopPolling() {
+      if (state.polling) {
+        clearInterval(state.polling);
+        state.polling = null;
+      }
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+
+    function showLoader(msg) {
+      document.getElementById('loadingText').textContent = msg || 'Carregando...';
+      document.getElementById('loadingOverlay').classList.add('show');
+    }
+
+    function hideLoader() {
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    function showToast(msg, type, duration) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast toast-' + (type || 'success') + ' show';
+
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, duration || 3000);
+    }
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+
+    // Enter no campo de ID
+    document.getElementById('inputDriverId').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    // Init Firebase
+    initFirebase();
+
+    // Registrar Service Worker
+    registerSW();
+
+    // Auto-login se já tem ID salvo
+    if (state.driverId) {
+      document.getElementById('inputDriverId').value = state.driverId;
+      apiCall('status', { driverId: state.driverId }).then(function(r) {
+        if (r.success) {
+          atualizarTela(r);
+          requestPushPermission();
+          startPolling();
+        } else {
+          logout();
+        }
+      }).catch(function() {
+        // Offline — mantém na tela de login
+      });
+    }
+  </script>
+
+</body>
+</html>
