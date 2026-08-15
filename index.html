@@ -168,7 +168,7 @@
 // ═══════════════════════════════════════════
 // CONFIG — TROCAR PELA SUA URL DO APPS SCRIPT
 // ═══════════════════════════════════════════
-var API_URL = 'COLE_SUA_URL_DO_APPS_SCRIPT_AQUI';
+var API_URL = 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0';
 
 // Firebase Config
 firebase.initializeApp({
@@ -251,7 +251,7 @@ function instalarApp() {
 
 // ═══ FCM TOKEN ═══
 function registrarPush() {
-  if (!('serviceWorker' in navigator) || !VAPID_KEY || VAPID_KEY === 'COLE_SUA_VAPID_KEY_AQUI') return;
+  if (!('serviceWorker' in navigator) || !VAPID_KEY || VAPID_KEY === 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0') return;
   try {
     var messaging = firebase.messaging();
     messaging.getToken({ vapidKey: VAPID_KEY }).then(function(token) {
