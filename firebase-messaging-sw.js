@@ -1,47 +1,67 @@
-// Firebase Messaging Service Worker
-// Recebe push notifications em background (app fechado)
+// ============================================================
+// Firebase Messaging Service Worker — Rotas NS
+// Recebe push notifications em background
+// ============================================================
 
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "AIzaSyA1pX97JMVtCuUsnDehvFaIpd30eIr7YxU",
-  authDomain: "rotas-ns.firebaseapp.com",
-  projectId: "rotas-ns",
-  storageBucket: "rotas-ns.firebasestorage.app",
-  messagingSenderId: "532204301425",
-  appId: "1:532204301425:web:775860c2f0545aa0a4bfd0"
+  apiKey:            'AIzaSyA1pX97JMVtCuUsnDehvFaIpd30eIr7YxU',
+  projectId:         'rotas-ns',
+  messagingSenderId: '532204301425',
+  appId:             '1:532204301425:web:775860c2f0545aa0a4bfd0'
 });
 
-const messaging = firebase.messaging();
+var messaging = firebase.messaging();
 
-// Background message handler
+// Handler de mensagens em background
 messaging.onBackgroundMessage(function(payload) {
-  console.log('[SW] Push recebido em background:', payload);
+  console.log('[SW] Background message:', payload);
 
-  var title = payload.notification ? payload.notification.title : 'Rotas NS';
-  var body = payload.notification ? payload.notification.body : 'Nova rota atribuída!';
+  var notificationTitle = payload.notification.title || 'Rotas NS';
+  var notificationOptions = {
+    body:    payload.notification.body || '',
+    icon:    '/icons/icon-192.png',
+    badge:   '/icons/icon-72.png',
+    vibrate: [200, 100, 200, 100, 200],
+    tag:     'rotas-ns-' + Date.now(),
+    data:    payload.data || {},
+    actions: [
+      { action: 'open', title: 'Abrir App' }
+    ]
+  };
 
-  return self.registration.showNotification(title, {
-    body: body,
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="32" fill="%23EE4D2D"/><text x="96" y="120" text-anchor="middle" font-size="100" fill="white">🚛</text></svg>',
-    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="16" fill="%23EE4D2D"/></svg>',
-    vibrate: [200, 100, 200],
-    data: payload.data || {}
-  });
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-// Ao clicar na notificação, abre o app
+// Ao clicar na notificação → abrir/focar o app
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
+
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      for (var i = 0; i < clientList.length; i++) {
-        if (clientList[i].url.includes('/') && 'focus' in clientList[i]) {
-          return clientList[i].focus();
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(function(clientList) {
+        // Se já tem uma aba aberta, foca nela
+        for (var i = 0; i < clientList.length; i++) {
+          var client = clientList[i];
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
+          }
         }
-      }
-      return clients.openWindow('/');
-    })
+        // Senão, abre uma nova
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
+      })
   );
+});
+
+// Ativação imediata do SW
+self.addEventListener('install', function(event) {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', function(event) {
+  event.waitUntil(clients.claim());
 });
