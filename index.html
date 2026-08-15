@@ -445,6 +445,10 @@
           Check-in: <span id="horaFila">—</span>
         </div>
       </div>
+
+      <button class="btn btn-danger mt-16" onclick="sairDaFila()">
+        🚪 Sair da Fila
+      </button>
     </div>
 
     <!-- Sub-tela: Chamado para bancada -->
@@ -721,7 +725,28 @@
       });
     }
 
+    function sairDaFila() {
+      if (!confirm('⚠️ ATENÇÃO!\n\nSe você sair, PERDERÁ sua posição na fila e terá que refazer todo o processo (aceitar rota + check-in).\n\nTem certeza que deseja sair?')) return;
+
+      apiCall('sairFila', { driverId: state.driverId }).then(function(r) {
+        if (r.success) {
+          showToast('Você saiu da fila.', 'warning');
+          atualizarTela(r);
+        } else {
+          showToast(r.message, 'error');
+        }
+      });
+    }
+
     function logout() {
+      // Se está na fila ou chamado, avisar que vai perder a posição
+      if (state.screen === 'fila' || state.screen === 'chamado') {
+        if (!confirm('⚠️ ATENÇÃO!\n\nVocê está na fila virtual. Se sair agora, PERDERÁ sua posição e terá que refazer todo o processo.\n\nTem certeza que deseja sair?')) return;
+
+        // Chamar sairFila no backend para limpar os dados
+        apiCall('sairFila', { driverId: state.driverId }, false).catch(function() {});
+      }
+
       stopPolling();
       stopGeoWatch();
       state.driverId = '';
