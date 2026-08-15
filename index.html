@@ -422,7 +422,7 @@
 
   <!-- ===== TELA 4: FILA VIRTUAL ===== -->
   <div id="tela-fila" class="tela">
-    <div class="card">
+    <div class="card" id="filaHeader">
       <div class="card-icon">⏳</div>
       <div class="card-title">Fila Virtual</div>
       <div class="card-desc">Aguarde sua vez. Você será notificado quando for chamado.</div>
@@ -454,9 +454,11 @@
     <!-- Sub-tela: Chamado para bancada -->
     <div id="filaChamado" style="display:none;">
       <div class="chamado-box">
-        <div style="font-size:48px;">🟢</div>
-        <div class="chamado-bancada" id="bancadaNome">BANCADA 1</div>
-        <div style="font-size:16px; color:var(--green); font-weight:600;">Dirija-se agora!</div>
+        <div style="font-size:56px;">🟢</div>
+        <div style="font-size:20px; color:var(--green); font-weight:700; margin-top:12px;">Sua vez chegou!</div>
+        <div style="font-size:16px; color:var(--text-muted); margin-top:8px;">Dirija-se à</div>
+        <div class="chamado-bancada" id="bancadaNome" style="font-size:36px;">MESA 1</div>
+        <div style="font-size:14px; color:var(--green); margin-top:8px; font-weight:600;">Vá agora mesmo!</div>
       </div>
 
       <div class="card mt-16" style="text-align:center;">
@@ -762,6 +764,11 @@
     // ============================================================
 
     function atualizarTela(data) {
+      // SEGURANÇA: se o status bruto é CARREGANDO, forçar tela chamado
+      if (data.status === 'CARREGANDO' && data.screen !== 'chamado') {
+        data.screen = 'chamado';
+      }
+
       state.screen  = data.screen;
       state.rota    = data.rota || '';
       state.bancada = data.bancada || '';
@@ -790,17 +797,23 @@
             state.posicao === 1 ? 'Você é o próximo!' : 'Aguarde ser chamado...';
           document.getElementById('rotaFila').textContent = state.rota;
           document.getElementById('horaFila').textContent = state.horaCi;
+          document.getElementById('filaHeader').style.display = 'block';
           document.getElementById('filaAguardando').style.display = 'block';
           document.getElementById('filaChamado').style.display = 'none';
           mostrarTela('fila');
           break;
 
         case 'chamado':
-          document.getElementById('bancadaNome').textContent = state.bancada;
+          document.getElementById('bancadaNome').textContent = state.bancada || 'Aguarde atribuição...';
           document.getElementById('rotaChamado').textContent = state.rota;
+          document.getElementById('filaHeader').style.display = 'none';
           document.getElementById('filaAguardando').style.display = 'none';
           document.getElementById('filaChamado').style.display = 'block';
           mostrarTela('fila');
+          // Vibrar o celular para chamar atenção (se suportado)
+          if (navigator.vibrate) {
+            navigator.vibrate([300, 100, 300, 100, 300]);
+          }
           break;
 
         case 'concluido':
