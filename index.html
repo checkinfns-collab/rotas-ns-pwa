@@ -168,7 +168,7 @@
 // ═══════════════════════════════════════════
 // CONFIG — TROCAR PELA SUA URL DO APPS SCRIPT
 // ═══════════════════════════════════════════
-var API_URL = 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0';
+var API_URL = 'https://script.google.com/macros/s/AKfycbyq-jkTCPKDuReB4jzJkv-1EAV9U42oHwuNdn0OGrMEHOTCuWyuzgBFtTUXDvZbMxy_/exec';
 
 // Firebase Config
 firebase.initializeApp({
@@ -182,7 +182,7 @@ firebase.initializeApp({
 
 // ═══ VAPID KEY — Gerar no Firebase Console ═══
 // Firebase Console → Configurações → Cloud Messaging → Web Push certificates → Gerar par de chaves
-var VAPID_KEY = 'COLE_SUA_VAPID_KEY_AQUI';
+var VAPID_KEY = 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0';
 
 // ═══ STATE ═══
 var driverId = null, driverLat = null, driverLng = null, gpsOk = false;
@@ -251,7 +251,7 @@ function instalarApp() {
 
 // ═══ FCM TOKEN ═══
 function registrarPush() {
-  if (!('serviceWorker' in navigator) || !VAPID_KEY || VAPID_KEY === 'BHZoChYkhDKpUZqBdY8rrEwUhlfeQbH2cZUunOXmXHLxNh0-00BhaVY72sN_loWbjxhM5pBXLJAFX2nbHY_YmG0') return;
+  if (!('serviceWorker' in navigator) || !VAPID_KEY || VAPID_KEY === 'COLE_SUA_VAPID_KEY_AQUI') return;
   try {
     var messaging = firebase.messaging();
     messaging.getToken({ vapidKey: VAPID_KEY }).then(function(token) {
