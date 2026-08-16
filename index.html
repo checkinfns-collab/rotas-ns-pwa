@@ -804,15 +804,21 @@
           break;
 
         case 'chamado':
-          document.getElementById('bancadaNome').textContent = state.bancada || 'Aguarde atribuição...';
+          // Exibe o nome recebido da bancada
+          document.getElementById('bancadaNome').textContent = data.bancada || 'Aguarde atribuição...';
           document.getElementById('rotaChamado').textContent = state.rota;
+          
+          // Esconde os cards referentes à Fila Virtual (posição e header)
           document.getElementById('filaHeader').style.display = 'none';
           document.getElementById('filaAguardando').style.display = 'none';
+          
+          // Mostra apenas o card informando a bancada ("Sua vez chegou!")
           document.getElementById('filaChamado').style.display = 'block';
           mostrarTela('fila');
-          // Vibrar o celular para chamar atenção (se suportado)
+          
+          // Vibra o celular do motorista chamando atenção (Padrão: longo, pausa, longo)
           if (navigator.vibrate) {
-            navigator.vibrate([300, 100, 300, 100, 300]);
+            navigator.vibrate([400, 200, 400, 200, 400]);
           }
           break;
 
